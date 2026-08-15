@@ -365,9 +365,9 @@ function outputRecords(indexes: IndexedTool[]): OutputIndexes {
 function compareCandidates(left: DependencyCandidate, right: DependencyCandidate): number {
   if (left.score !== right.score) return right.score - left.score;
   const byProducer = left.producerSlug.localeCompare(right.producerSlug, "en-US");
-  return byProducer !== 0
-    ? byProducer
-    : left.outputPath.localeCompare(right.outputPath, "en-US");
+  if (byProducer !== 0) return byProducer;
+  const byDepth = left.outputPath.split(".").length - right.outputPath.split(".").length;
+  return byDepth !== 0 ? byDepth : left.outputPath.localeCompare(right.outputPath, "en-US");
 }
 
 export function inferDependencyCandidates(

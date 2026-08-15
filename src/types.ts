@@ -96,8 +96,10 @@ export interface CandidateInferenceResult {
 
 export type SelectionRejectionReason =
   | "below_minimum_score"
+  | "generic_content_field"
   | "outside_score_window"
-  | "per_input_limit";
+  | "per_input_limit"
+  | "producer_context_mismatch";
 
 export interface CandidateDecision {
   candidate: DependencyCandidate;

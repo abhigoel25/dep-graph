@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 
 import { selectDeterministicEdges } from "../src/selection.js";
 import type {
+  CandidateFeature,
   CandidateCase,
   CandidateInferenceResult,
   DependencyCandidate,
@@ -20,15 +21,24 @@ const input: FieldEvidence = {
   source: "input",
 };
 
-function candidate(producerSlug: string, score: number): DependencyCandidate {
+function feature(code: string): CandidateFeature {
+  return { code, detail: code, weight: 1 };
+}
+
+function candidate(
+  producerSlug: string,
+  score: number,
+  evidenceCodes: string[] = [],
+  label = "widget_id",
+): DependencyCandidate {
   return {
     producerSlug,
     consumerSlug: "ACME_UPDATE_WIDGET",
-    label: "widget_id",
+    label,
     outputPath: "data.widgets[].id",
     score,
     confidence: score >= 14 ? "high" : score >= 10 ? "medium" : "low",
-    evidence: [],
+    evidence: evidenceCodes.map(feature),
   };
 }
 
@@ -124,6 +134,128 @@ describe("selectDeterministicEdges", () => {
       minimumScore: 19,
       scoreWindow: 0,
     });
+    assert.deepEqual(result.edges, []);
+  });
+
+  it("recovers a low-scoring generic creation ID when independent context agrees", () => {
+    const created = candidate("ACME_CREATE_WIDGET", 10, [
+      "creation_operation",
+      "producer_context_match",
+      "shared_scope",
+      "generic_output_penalty",
+    ]);
+    created.outputPath = "data.id";
+    const result = selectDeterministicEdges(
+      inference([
+        candidate("ACME_LIST_WIDGETS", 21),
+        created,
+      ]),
+    );
+
+    assert.deepEqual(
+      result.edges.map((edge) => edge.from),
+      ["ACME_CREATE_WIDGET", "ACME_LIST_WIDGETS"],
+    );
+  });
+
+  it("does not let the lexical cap suppress a semantically guarded creation", () => {
+    const created = candidate("ACME_CREATE_WIDGET", 10, [
+      "creation_operation",
+      "producer_context_match",
+      "shared_scope",
+      "generic_output_penalty",
+    ]);
+    created.outputPath = "data.id";
+    const result = selectDeterministicEdges(
+      inference([
+        candidate("ACME_LIST_WIDGETS", 21),
+        candidate("ACME_SEARCH_WIDGETS", 21),
+        created,
+      ]),
+      { maxEdgesPerInput: 1 },
+    );
+
+    assert.deepEqual(
+      result.edges.map((edge) => edge.from),
+      ["ACME_CREATE_WIDGET", "ACME_LIST_WIDGETS"],
+    );
+    assert.equal(result.decisions[1]?.reason, "per_input_limit");
+  });
+
+  it("does not recover an incidental generic ID from a different created subject", () => {
+    const result = selectDeterministicEdges(
+      inference([
+        candidate("ACME_CREATE_MILESTONE", 10, [
+          "creation_operation",
+          "producer_context_match",
+          "shared_scope",
+          "generic_output_penalty",
+        ]),
+      ]),
+    );
+
+    assert.equal(result.decisions[0]?.reason, "below_minimum_score");
+    assert.deepEqual(result.edges, []);
+  });
+
+  it("does not recover a generic ID nested beneath another resource", () => {
+    const nested = candidate("ACME_CREATE_WIDGET", 10, [
+      "creation_operation",
+      "producer_context_match",
+      "shared_scope",
+      "generic_output_penalty",
+    ]);
+    nested.outputPath = "data.owner.id";
+
+    const result = selectDeterministicEdges(inference([nested]));
+
+    assert.equal(result.decisions[0]?.reason, "below_minimum_score");
+    assert.deepEqual(result.edges, []);
+  });
+
+  it("does not recover a same-label ID from a conflicting resource qualifier", () => {
+    const reaction = candidate("ACME_CREATE_COMMIT_REACTION", 10, [
+      "creation_operation",
+      "producer_context_match",
+      "shared_scope",
+      "generic_output_penalty",
+    ], "reaction_id");
+    reaction.consumerSlug = "ACME_DELETE_ISSUE_REACTION";
+    reaction.outputPath = "data.id";
+
+    const result = selectDeterministicEdges(inference([reaction]));
+
+    assert.equal(result.decisions[0]?.reason, "below_minimum_score");
+    assert.deepEqual(result.edges, []);
+  });
+
+  it("rejects incidental mutation output without producer-to-input context", () => {
+    const result = selectDeterministicEdges(
+      inference([
+        candidate("ACME_UPDATE_ACCOUNT", 24, [
+          "mutation_operation",
+          "local_entity_match",
+        ]),
+      ]),
+    );
+
+    assert.equal(result.decisions[0]?.reason, "producer_context_mismatch");
+    assert.deepEqual(result.edges, []);
+  });
+
+  it("abstains from treating mutation response names as deterministic identity", () => {
+    const result = selectDeterministicEdges(
+      inference([
+        candidate(
+          "ACME_ADD_COLLABORATOR",
+          29,
+          ["creation_operation", "producer_context_match", "shared_scope"],
+          "names",
+        ),
+      ]),
+    );
+
+    assert.equal(result.decisions[0]?.reason, "generic_content_field");
     assert.deepEqual(result.edges, []);
   });
 });
