@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "catalog": {
+    "tools": 893,
+    "identifier_inputs": 661,
+    "indexed_outputs": 26161,
+    "candidate_cases": 610,
+    "candidates": 4200
+  },
+  "graph": {
+    "nodes": 893,
+    "edges": 1595,
+    "provenance_ratio": 1,
+    "labeled_edge_ratio": 1,
+    "duplicate_nodes": 0,
+    "duplicate_edges": 0,
+    "dangling_edges": 0,
+    "self_edges": 0,
+    "isolated_nodes": 326,
+    "weak_components": 344,
+    "max_producer_out_degree": 39,
+    "hub_edge_share": 0.02445141065830721
+  },
+  "gold": {
+    "cases": 16,
+    "passed": 14,
+    "accuracy": 0.875,
+    "positive_candidate_recall": 1,
+    "positive_selection_recall": 0.9,
+    "negative_rejection_rate": 0.8333333333333334,
+    "results": [
+      {
+        "from": "GITHUB_LIST_REPOSITORY_ISSUES",
+        "to": "GITHUB_CREATE_AN_ISSUE_COMMENT",
+        "label": "issue_number",
+        "expected": true,
+        "rationale": "Issue listing directly exposes each issue number.",
+        "candidate_retrieved": true,
+        "selected": true,
+        "passed": true
+      },
+      {
+        "from": "GITHUB_LIST_PULL_REQUESTS",
+        "to": "GITHUB_MERGE_A_PULL_REQUEST",
+        "label": "pull_number",
+        "expected": true,
+        "rationale": "Pull-request listing directly exposes each pull number.",
+        "candidate_retrieved": true,
+        "selected": true,
+        "passed": true
+      },
+      {
+        "from": "GITHUB_LIST_ARTIFACTS_FOR_A_REPOSITORY",
+        "to": "GITHUB_DELETE_ARTIFACT",
+        "label": "artifact_id",
+        "expected": true,
+        "rationale": "Artifact listing directly exposes artifact IDs.",
+        "candidate_retrieved": true,
+        "selected": true,
+        "passed": true
+      },
+      {
+        "from": "GITHUB_LIST_RELEASES",
+        "to": "GITHUB_DELETE_A_RELEASE",
+        "label": "release_id",
+        "expected": true,
+        "rationale": "Release listing directly exposes release IDs.",
+        "candidate_retrieved": true,
+        "selected": true,
+        "passed": true
+      },
+      {
+        "from": "GITHUB_LIST_ENVIRONMENTS",
+        "to": "GITHUB_DELETE_ENVIRONMENT",
+        "label": "environment_name",
+        "expected": true,
+        "rationale": "Environment listing directly exposes environment names.",
+        "candidate_retrieved": true,
+        "selected": true,
+        "passed": true
+      },
+      {
+        "from": "GITHUB_CREATE_AN_AUTOLINK_REFERENCE_FOR_A_REPOSITORY",
+        "to": "GITHUB_DELETE_AUTOLINK_REFERENCE",
+        "label": "autolink_id",
+        "expected": true,
+        "rationale": "Creation returns the new autolink's generic data.id.",
+        "candidate_retrieved": true,
+        "selected": true,
+        "passed": true
+      },
+      {
+        "from": "GITHUB_CREATE_A_GITHUB_PAGES_DEPLOYMENT",
+        "to": "GITHUB_GET_THE_STATUS_OF_A_GITHUB_PAGES_DEPLOYMENT",
+        "label": "pages_deployment_id",
+        "expected": true,
+        "rationale": "Creation returns the deployment ID required by status lookup.",
+        "candidate_retrieved": true,
+        "selected": true,
+        "passed": true
+      },
+      {
+        "from": "GITHUB_CREATE_A_DEPLOY_KEY",
+        "to": "GITHUB_DELETE_DEPLOY_KEY",
+        "label": "key_id",
+        "expected": true,
+        "rationale": "Creation returns the new deploy key's generic data.id.",
+        "candidate_retrieved": true,
+        "selected": true,
+        "passed": true
+      },
+      {
+        "from": "GITHUB_CREATE_A_RELEASE",
+        "to": "GITHUB_DELETE_A_RELEASE",
+        "label": "release_id",
+        "expected": true,
+        "rationale": "Creation returns the new release ID and is a direct create-to-delete chain.",
+        "candidate_retrieved": true,
+        "selected": false,
+        "passed": false
+      },
+      {
+        "from": "GITHUB_CREATE_A_DISCUSSION",
+        "to": "GITHUB_CREATE_REACTION_FOR_A_TEAM_DISCUSSION",
+        "label": "discussion_number",
+        "expected": true,
+        "rationale": "The producer creates a team discussion and returns its number.",
+        "candidate_retrieved": true,
+        "selected": true,
+        "passed": true
+      },
+      {
+        "from": "GITHUB_ADD_ASSIGNEES_TO_AN_ISSUE",
+        "to": "GITHUB_DELETE_MILESTONE",
+        "label": "milestone_number",
+        "expected": false,
+        "rationale": "The milestone is incidental nested data on an issue mutation, not the resource operated by the producer.",
+        "candidate_retrieved": true,
+        "selected": true,
+        "passed": false
+      },
+      {
+        "from": "GITHUB_CREATE_A_FORK",
+        "to": "GITHUB_GET_GITIGNORE_TEMPLATE",
+        "label": "name",
+        "expected": false,
+        "rationale": "A repository name is not a gitignore template name.",
+        "candidate_retrieved": true,
+        "selected": false,
+        "passed": true
+      },
+      {
+        "from": "GITHUB_CREATE_AN_ISSUE",
+        "to": "GITHUB_RESET_A_TOKEN",
+        "label": "client_id",
+        "expected": false,
+        "rationale": "An issue response cannot provide an OAuth application's client ID.",
+        "candidate_retrieved": true,
+        "selected": false,
+        "passed": true
+      },
+      {
+        "from": "GITHUB_ADD_A_REPOSITORY_COLLABORATOR",
+        "to": "GITHUB_REPLACE_ALL_REPOSITORY_TOPICS",
+        "label": "names",
+        "expected": false,
+        "rationale": "Collaborator response names are not a repository topic-name list.",
+        "candidate_retrieved": true,
+        "selected": false,
+        "passed": true
+      },
+      {
+        "from": "GITHUB_CREATE_A_CODESPACE_IN_A_REPOSITORY",
+        "to": "GITHUB_DELETE_A_REFERENCE",
+        "label": "ref",
+        "expected": false,
+        "rationale": "A codespace's nested ref is incidental and not a discovered Git reference intended for deletion.",
+        "candidate_retrieved": true,
+        "selected": false,
+        "passed": true
+      },
+      {
+        "from": "GITHUB_DELETE_PROJECT_COLUMN",
+        "to": "GITHUB_CREATE_A_USER_PROJECT",
+        "label": "name",
+        "expected": false,
+        "rationale": "A deleted column's nested name is not a user-project name dependency.",
+        "candidate_retrieved": true,
+        "selected": false,
+        "passed": true
+      }
+    ]
+  },
+  "comparison": {
+    "offline_edges": 1759,
+    "online_edges": 1595,
+    "intersection": 1071,
+    "online_only": 524,
+    "offline_only": 688,
+    "jaccard": 0.469119579500657
+  },
+  "evaluation_duration_ms": 10120
+}
