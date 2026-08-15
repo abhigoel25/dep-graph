@@ -94,6 +94,30 @@ export interface CandidateInferenceResult {
   stats: CandidateInferenceStats;
 }
 
+export type SelectionRejectionReason =
+  | "below_minimum_score"
+  | "outside_score_window"
+  | "per_input_limit";
+
+export interface CandidateDecision {
+  candidate: DependencyCandidate;
+  accepted: boolean;
+  reason?: SelectionRejectionReason;
+}
+
+export interface DeterministicSelectionStats {
+  cases: number;
+  abstainedCases: number;
+  selectedEdges: number;
+  rejectedCandidates: number;
+}
+
+export interface DeterministicSelectionResult {
+  edges: GraphEdge[];
+  decisions: CandidateDecision[];
+  stats: DeterministicSelectionStats;
+}
+
 export interface GraphNode {
   id: string;
   service?: string;
