@@ -10,34 +10,27 @@
  *     environment (set from your assessment page's AI credentials; the same are provided
  *     when we run your generator). Use an OpenRouter model id such as `openai/gpt-4o`.
  *
- * This is a SKELETON. Replace the inference in generate() with your own approach. Do not
- * hardcode a toolkit's relations: your node ids must be slugs from the catalog you are
- * handed, and your output must change when the input changes.
+ * The generator first retrieves candidates from required-input and nested-output schema
+ * evidence, then applies a conservative deterministic policy. A later model adjudication
+ * stage can refine this evidence without weakening the catalog-provenance firewall.
  */
-import { writeFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
+import { inferDependencyCandidates } from "./candidates.js";
 import { loadCatalogFile } from "./catalog.js";
-import type { DependencyGraph, NormalizedTool } from "./types.js";
+import { assembleGraph, writeGraphAtomic } from "./graph.js";
+import { selectDeterministicEdges } from "./selection.js";
+import type { NormalizedTool, OfflineGenerationResult } from "./types.js";
 
 // The catalog path is the last CLI argument (we append it after your run command).
 const OUT_PATH = "dependency_graph.json";
 
-/**
- * TODO: your inference goes here.
- *
- * The baseline below emits every tool as a node and no edges. It passes the
- * "nodes are real slugs" check but scores ~0 on correctness (no dependencies) and
- * will fail the has-edges gate. Replace it: for each tool's required inputs, infer
- * which other tools produce a matching output id/field, and emit those edges.
- * Runtime LLM inference is encouraged. Keep node ids sourced from the catalog you
- * were given.
- */
-async function generate(tools: NormalizedTool[]): Promise<DependencyGraph> {
-  const nodes = tools.map((tool) => {
-    if (tool.toolkit) return { id: tool.slug, service: tool.toolkit };
-    return { id: tool.slug };
-  });
-  return { nodes, edges: [] };
+export function generateOffline(tools: NormalizedTool[]): OfflineGenerationResult {
+  const inference = inferDependencyCandidates(tools);
+  const selection = selectDeterministicEdges(inference);
+  const graph = assembleGraph(tools, selection.edges);
+  return { graph, inference, selection };
 }
 
 async function main() {
@@ -45,17 +38,24 @@ async function main() {
   if (!catalogPath) throw new Error("pass the toolkit catalog path as the first argument");
 
   const catalog = loadCatalogFile(catalogPath);
-  const graph = await generate(catalog.tools);
-  writeFileSync(OUT_PATH, JSON.stringify(graph, null, 2), "utf-8");
+  const result = generateOffline(catalog.tools);
+  writeGraphAtomic(result.graph, OUT_PATH);
   if (catalog.warnings.length > 0) {
     console.error(`catalog loaded with ${catalog.warnings.length} warning(s)`);
   }
   console.error(
-    `wrote ${graph.nodes.length} nodes, ${graph.edges.length} edges to ${OUT_PATH}`,
+    `indexed ${result.inference.stats.identifierInputs} identifier inputs and ` +
+      `${result.inference.stats.indexedOutputs} output fields`,
+  );
+  console.error(
+    `wrote ${result.graph.nodes.length} nodes, ${result.graph.edges.length} edges to ${OUT_PATH}`,
   );
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+const entrypoint = process.argv[1] ? pathToFileURL(resolve(process.argv[1])).href : undefined;
+if (entrypoint === import.meta.url) {
+  main().catch((error: unknown) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}

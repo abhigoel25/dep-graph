@@ -94,6 +94,36 @@ export interface CandidateInferenceResult {
   stats: CandidateInferenceStats;
 }
 
+export type SelectionRejectionReason =
+  | "below_minimum_score"
+  | "outside_score_window"
+  | "per_input_limit";
+
+export interface CandidateDecision {
+  candidate: DependencyCandidate;
+  accepted: boolean;
+  reason?: SelectionRejectionReason;
+}
+
+export interface DeterministicSelectionStats {
+  cases: number;
+  abstainedCases: number;
+  selectedEdges: number;
+  rejectedCandidates: number;
+}
+
+export interface DeterministicSelectionResult {
+  edges: GraphEdge[];
+  decisions: CandidateDecision[];
+  stats: DeterministicSelectionStats;
+}
+
+export interface OfflineGenerationResult {
+  graph: DependencyGraph;
+  inference: CandidateInferenceResult;
+  selection: DeterministicSelectionResult;
+}
+
 export interface GraphNode {
   id: string;
   service?: string;
@@ -108,4 +138,19 @@ export interface GraphEdge {
 export interface DependencyGraph {
   nodes: GraphNode[];
   edges: GraphEdge[];
+}
+
+export type GraphIntegrityIssueCode =
+  | "consumer_not_found"
+  | "duplicate_node"
+  | "label_not_required"
+  | "node_not_found"
+  | "producer_not_found"
+  | "self_edge";
+
+export interface GraphIntegrityIssue {
+  code: GraphIntegrityIssueCode;
+  message: string;
+  edge?: GraphEdge;
+  nodeId?: string;
 }
