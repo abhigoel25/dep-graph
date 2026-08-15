@@ -14,39 +14,13 @@
  * hardcode a toolkit's relations: your node ids must be slugs from the catalog you are
  * handed, and your output must change when the input changes.
  */
-import { readFileSync, writeFileSync } from "fs";
+import { writeFileSync } from "node:fs";
 
-type Tool = Record<string, any>;
-interface Node {
-  id: string;
-  service?: string;
-}
-interface Edge {
-  from: string;
-  to: string;
-  label?: string;
-}
-interface Graph {
-  nodes: Node[];
-  edges: Edge[];
-}
+import { loadCatalogFile } from "./catalog.js";
+import type { DependencyGraph, NormalizedTool } from "./types.js";
 
 // The catalog path is the last CLI argument (we append it after your run command).
-const CATALOG_PATH = process.argv.length > 2 ? process.argv[process.argv.length - 1] : undefined;
 const OUT_PATH = "dependency_graph.json";
-
-function loadCatalog(): Tool[] {
-  if (!CATALOG_PATH) {
-    throw new Error("pass the toolkit catalog path as the first argument");
-  }
-  const data = JSON.parse(readFileSync(CATALOG_PATH, "utf-8"));
-  // getRawComposioTools returns a list of tools (or { tools: [...] }).
-  return Array.isArray(data) ? data : (data.tools ?? data.items ?? []);
-}
-
-function slugOf(tool: Tool): string | undefined {
-  return tool.slug ?? tool.name ?? tool.function?.name;
-}
 
 /**
  * TODO: your inference goes here.
@@ -58,18 +32,24 @@ function slugOf(tool: Tool): string | undefined {
  * Runtime LLM inference is encouraged. Keep node ids sourced from the catalog you
  * were given.
  */
-async function generate(tools: Tool[]): Promise<Graph> {
-  const nodes: Node[] = tools
-    .map(slugOf)
-    .filter((s): s is string => !!s)
-    .map((id) => ({ id }));
-  const edges: Edge[] = [];
-  return { nodes, edges };
+async function generate(tools: NormalizedTool[]): Promise<DependencyGraph> {
+  const nodes = tools.map((tool) => {
+    if (tool.toolkit) return { id: tool.slug, service: tool.toolkit };
+    return { id: tool.slug };
+  });
+  return { nodes, edges: [] };
 }
 
 async function main() {
-  const graph = await generate(loadCatalog());
+  const catalogPath = process.argv.length > 2 ? process.argv.at(-1) : undefined;
+  if (!catalogPath) throw new Error("pass the toolkit catalog path as the first argument");
+
+  const catalog = loadCatalogFile(catalogPath);
+  const graph = await generate(catalog.tools);
   writeFileSync(OUT_PATH, JSON.stringify(graph, null, 2), "utf-8");
+  if (catalog.warnings.length > 0) {
+    console.error(`catalog loaded with ${catalog.warnings.length} warning(s)`);
+  }
   console.error(
     `wrote ${graph.nodes.length} nodes, ${graph.edges.length} edges to ${OUT_PATH}`,
   );
