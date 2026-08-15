@@ -5,7 +5,10 @@ import type {
   NormalizedTool,
 } from "./types.js";
 
-const DEFAULT_CASES_PER_BATCH = 20;
+// The Litmus proxy may enforce a low request-count ceiling. GPT-5.4's context window
+// comfortably supports 50 compact cases while per-case response validation still
+// isolates malformed decisions.
+const DEFAULT_CASES_PER_BATCH = 50;
 const DEFAULT_CANDIDATES_PER_CASE = 6;
 const DESCRIPTION_LIMIT = 240;
 

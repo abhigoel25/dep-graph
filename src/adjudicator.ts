@@ -19,7 +19,7 @@ import type {
 } from "./types.js";
 
 export const DEFAULT_MODEL = "openai/gpt-5.4";
-const DEFAULT_CONCURRENCY = 3;
+const DEFAULT_CONCURRENCY = 1;
 const DEFAULT_MAX_RETRIES = 2;
 const DEFAULT_RETRY_DELAY_MS = 300;
 const DEFAULT_TIMEOUT_MS = 45_000;
