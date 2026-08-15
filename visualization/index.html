@@ -9,32 +9,33 @@
 <body>
   <main class="shell">
     <header class="topbar">
-      <div class="brand"><span class="mark">DA</span><div><h1>Dependency Atlas</h1><p>Evidence-led tool choreography</p></div></div>
+      <div class="brand"><span class="mark"><i></i><i></i><i></i></span><div><h1>Dependency Atlas</h1><p>Explore how tool outputs become actionable inputs</p></div></div>
       <div class="metrics" aria-label="Graph summary">
         <span><b id="node-count">—</b> tools</span><span><b id="edge-count">—</b> dependencies</span><span><b id="mode">—</b> mode</span>
       </div>
     </header>
     <section class="workspace">
       <aside class="rail">
-        <label for="search">Find a tool</label>
+        <div class="step"><b>1</b><span><strong>Choose an operation</strong><small>Search or select a catalog tool</small></span></div>
+        <label for="search" class="sr-only">Find a tool</label>
         <div class="search-wrap"><span>⌕</span><input id="search" autocomplete="off" placeholder="Search 893 tool slugs…"></div>
         <div id="suggestions" class="suggestions" aria-live="polite"></div>
-        <div class="section-title">Neighborhood</div>
+        <div class="step compact"><b>2</b><span><strong>Shape the neighborhood</strong><small>Focus on inputs, outputs, or both</small></span></div>
         <div class="segmented" role="group" aria-label="Edge direction">
           <button data-direction="incoming">Inputs</button><button class="active" data-direction="both">Both</button><button data-direction="outgoing">Outputs</button>
         </div>
         <label for="limit">Connections <output id="limit-value">18</output></label>
         <input id="limit" type="range" min="6" max="40" value="18">
         <div class="legend"><span><i class="dot producer"></i>Producer</span><span><i class="dot focus"></i>Selected</span><span><i class="dot consumer"></i>Consumer</span></div>
-        <div class="tip">Select a node or connection to inspect its provenance.</div>
+        <div class="tip"><b>Tip</b> Select a connection line to see why it exists.</div>
       </aside>
       <section class="stage">
-        <div class="stage-heading"><div><span class="eyebrow">Selected tool</span><h2 id="selected-title">Loading graph…</h2></div><button id="reset">Canonical example</button></div>
-        <svg id="graph" role="img" aria-labelledby="graph-title graph-desc"><title id="graph-title">Tool dependency neighborhood</title><desc id="graph-desc">Producer tools appear to the left, the selected tool in the center, and consumer tools to the right.</desc><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z"></path></marker></defs><g id="edges"></g><g id="nodes"></g></svg>
+        <div class="stage-heading"><div><span class="eyebrow">Active neighborhood</span><h2 id="selected-title">Loading graph…</h2><p id="visible-status">Preparing dependency data</p></div><button id="reset">View example</button></div>
+        <svg id="graph" role="img" aria-labelledby="graph-title graph-desc"><title id="graph-title">Tool dependency neighborhood</title><desc id="graph-desc">Producer tools appear to the left, the selected tool in the center, and consumer tools to the right.</desc><defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z"></path></marker></defs><g id="lane-labels"></g><g id="edges"></g><g id="nodes"></g></svg>
         <div id="empty" hidden>No matching dependencies in this direction.</div>
       </section>
       <aside class="inspector">
-        <span class="eyebrow">Evidence inspector</span>
+        <div class="step inspector-step"><b>3</b><span><strong>Inspect the evidence</strong><small>Schema paths, model rationale, and signals</small></span></div>
         <div id="inspector-content"><h3>Choose a connection</h3><p class="muted">Every line is backed by catalog schema evidence. Select one to see why it survived adjudication.</p></div>
       </aside>
     </section>
