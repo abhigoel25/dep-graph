@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dependency Atlas</title>
+  <link rel="stylesheet" href="/visualization/styles.css">
+</head>
+<body>
+  <canvas id="scene" aria-label="Interactive dependency graph"></canvas>
+  <header>
+    <a class="brand" href="#"><span class="brand-mark"></span><span><b>Dependency Atlas</b><small>GitHub tool intelligence</small></span></a>
+    <div class="view-switch" role="group" aria-label="View mode"><button class="active" data-view="atlas">3D atlas</button><button data-view="focus">Focused flow</button></div>
+    <div class="run"><i></i><span id="mode">loading</span></div>
+  </header>
+  <aside class="command">
+    <label for="search">Find an operation</label>
+    <div class="search"><span>⌕</span><input id="search" autocomplete="off" placeholder="Search tool catalog"><kbd>/</kbd></div>
+    <div id="results"></div>
+    <div class="summary"><span><b id="node-count">—</b> tools</span><span><b id="edge-count">—</b> dependencies</span></div>
+    <div class="controls">
+      <div><label>Connections</label><output id="limit-value">24</output></div>
+      <input id="limit" type="range" min="8" max="60" value="24">
+      <div class="filter"><button data-direction="incoming">Inputs</button><button class="active" data-direction="both">Both</button><button data-direction="outgoing">Outputs</button></div>
+    </div>
+    <div class="help"><span><i></i>Drag to orbit</span><span><i></i>Scroll to zoom</span><span><i></i>Click a node</span></div>
+  </aside>
+  <section class="context">
+    <span class="overline" id="view-label">Selected operation</span>
+    <h1 id="selected-title">Loading graph…</h1>
+    <p id="selected-meta">Preparing dependency data</p>
+    <button id="reset">Reset view</button>
+  </section>
+  <aside class="drawer">
+    <div class="drawer-head"><div><span class="overline">Evidence inspector</span><h2>Connections</h2></div><span id="connection-count">0</span></div>
+    <div id="connections"></div>
+    <div id="evidence"><p>Select a connection to inspect its schema path and weighted evidence.</p></div>
+  </aside>
+  <div class="loading" id="loading"><span></span>Mapping dependency space</div>
+  <script src="/visualization/app.js" defer></script>
+</body>
+</html>

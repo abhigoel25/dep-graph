@@ -3,13 +3,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "generate": "node --import tsx src/generate.ts",
-    "selfcheck": "node --import tsx src/selfcheck.ts"
+    "generate": "node --env-file-if-exists=.env --import tsx src/generate.ts",
+    "evaluate": "node --import tsx src/evaluate.ts",
+    "evaluate:live": "node --env-file-if-exists=.env --import tsx src/live-evaluate.ts",
+    "visualize": "node --import tsx src/serve-visualization.ts",
+    "selfcheck": "node --import tsx src/selfcheck.ts",
+    "test": "node --import tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "openai": "^6.48.0"
   },
   "devDependencies": {
-    "tsx": "^4.19.0"
+    "@types/node": "^26.2.0",
+    "tsx": "^4.19.0",
+    "typescript": "^7.0.2"
   }
 }
