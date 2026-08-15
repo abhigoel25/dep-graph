@@ -2,4 +2,4 @@
 
 Run `npm run visualize`, then open `http://127.0.0.1:4173`.
 
-The viewer intentionally renders local neighborhoods rather than all 893 nodes at once. Search selects any catalog tool; direction and connection controls tune the view; selecting a labeled edge reveals its required input, producer output path, evidence score/features, confidence, and model rationale. All data and assets are local.
+The dependency-free Canvas interface provides two complementary representations: a draggable and zoomable 3D atlas of all tools and edges, and a focused upstream/downstream flow for one operation. Search or click any node, filter direction, tune visible connections, then choose a connection in the evidence drawer to inspect its required input, producer output path, score, confidence, and weighted features. All data and assets are local.
