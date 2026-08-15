@@ -55,6 +55,45 @@ export interface SchemaIndex {
   warnings: SchemaWarning[];
 }
 
+export type CandidateConfidence = "high" | "medium" | "low";
+
+export interface CandidateFeature {
+  code: string;
+  detail: string;
+  weight: number;
+}
+
+export interface DependencyCandidate {
+  producerSlug: string;
+  consumerSlug: string;
+  label: string;
+  outputPath: string;
+  score: number;
+  confidence: CandidateConfidence;
+  evidence: CandidateFeature[];
+}
+
+export interface CandidateCase {
+  consumerSlug: string;
+  label: string;
+  input: FieldEvidence;
+  candidates: DependencyCandidate[];
+}
+
+export interface CandidateInferenceStats {
+  tools: number;
+  requiredInputs: number;
+  identifierInputs: number;
+  indexedOutputs: number;
+  candidateCases: number;
+  candidates: number;
+}
+
+export interface CandidateInferenceResult {
+  cases: CandidateCase[];
+  stats: CandidateInferenceStats;
+}
+
 export interface GraphNode {
   id: string;
   service?: string;
