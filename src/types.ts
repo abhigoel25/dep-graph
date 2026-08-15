@@ -28,6 +28,33 @@ export interface NormalizedCatalog {
   source: string;
 }
 
+export type FieldSource = "input" | "output";
+
+export interface FieldEvidence {
+  name: string;
+  path: string;
+  pathSegments: string[];
+  types: string[];
+  description: string;
+  title: string;
+  required: boolean;
+  source: FieldSource;
+}
+
+export type SchemaWarningCode = "cyclic_ref" | "depth_limit" | "unresolved_ref";
+
+export interface SchemaWarning {
+  code: SchemaWarningCode;
+  message: string;
+  path: string;
+  ref?: string;
+}
+
+export interface SchemaIndex {
+  fields: FieldEvidence[];
+  warnings: SchemaWarning[];
+}
+
 export interface GraphNode {
   id: string;
   service?: string;
