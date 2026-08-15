@@ -4,6 +4,7 @@ import { describe, it } from "node:test";
 import type { ModelTransport } from "../src/adjudicator.js";
 import { normalizeCatalog } from "../src/catalog.js";
 import { generateGraph, generateOffline } from "../src/generate.js";
+import { buildInferenceReport } from "../src/report.js";
 
 function catalogFixture() {
   return normalizeCatalog([
@@ -92,5 +93,10 @@ describe("offline generation pipeline", () => {
     assert.equal(result.mode, "online");
     assert.deepEqual(result.graph.edges, []);
     assert.equal(result.adjudication.stats.modelCases, 1);
+    const report = buildInferenceReport(result);
+    assert.equal(report.run.mode, "online");
+    assert.equal(report.cases[0]?.decision_source, "model");
+    assert.equal(report.cases[0]?.candidates[0]?.selected, false);
+    assert.match(report.cases[0]?.rationale ?? "", /conservatively abstained/i);
   });
 });

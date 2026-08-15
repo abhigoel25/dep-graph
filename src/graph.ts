@@ -116,7 +116,7 @@ export function assembleGraph(
   return graph;
 }
 
-export function writeGraphAtomic(graph: DependencyGraph, outputPath: string): void {
+export function writeJsonAtomic(value: unknown, outputPath: string): void {
   const directory = dirname(outputPath);
   const temporaryPath = join(
     directory,
@@ -124,10 +124,14 @@ export function writeGraphAtomic(graph: DependencyGraph, outputPath: string): vo
   );
 
   try {
-    writeFileSync(temporaryPath, `${JSON.stringify(graph, null, 2)}\n`, "utf8");
+    writeFileSync(temporaryPath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
     renameSync(temporaryPath, outputPath);
   } catch (error) {
     if (existsSync(temporaryPath)) unlinkSync(temporaryPath);
     throw error;
   }
+}
+
+export function writeGraphAtomic(graph: DependencyGraph, outputPath: string): void {
+  writeJsonAtomic(graph, outputPath);
 }

@@ -28,7 +28,8 @@ import type {
 } from "./adjudicator.js";
 import { inferDependencyCandidates } from "./candidates.js";
 import { loadCatalogFile } from "./catalog.js";
-import { assembleGraph, writeGraphAtomic } from "./graph.js";
+import { assembleGraph, writeGraphAtomic, writeJsonAtomic } from "./graph.js";
+import { buildInferenceReport } from "./report.js";
 import { selectDeterministicEdges } from "./selection.js";
 import type {
   CandidateInferenceResult,
@@ -39,6 +40,7 @@ import type {
 
 // The catalog path is the last CLI argument (we append it after your run command).
 const OUT_PATH = "dependency_graph.json";
+const REPORT_PATH = "inference_report.json";
 
 export function generateOffline(tools: NormalizedTool[]): OfflineGenerationResult {
   const inference = inferDependencyCandidates(tools);
@@ -91,6 +93,7 @@ async function main() {
   const catalog = loadCatalogFile(catalogPath);
   const result = await generateGraph(catalog.tools, createModelTransportFromEnv());
   writeGraphAtomic(result.graph, OUT_PATH);
+  writeJsonAtomic(buildInferenceReport(result), REPORT_PATH);
   if (catalog.warnings.length > 0) {
     console.error(`catalog loaded with ${catalog.warnings.length} warning(s)`);
   }
@@ -110,6 +113,7 @@ async function main() {
   console.error(
     `wrote ${result.graph.nodes.length} nodes, ${result.graph.edges.length} edges to ${OUT_PATH}`,
   );
+  console.error(`wrote candidate evidence and decisions to ${REPORT_PATH}`);
 }
 
 const entrypoint = process.argv[1] ? pathToFileURL(resolve(process.argv[1])).href : undefined;
