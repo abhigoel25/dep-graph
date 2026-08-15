@@ -1,23 +1,3 @@
-# build a tool dependency graph generator 
-
-we care about the quality and structure of the dependency relationships you discover
-
-some actions need precursor actions before being able to execute them
-
-a concrete example
-
-1. the tool `GITHUB_CREATE_AN_ISSUE_COMMENT` which needs an `issue_number`
-2. which can be got by `GITHUB_LIST_REPOSITORY_ISSUES` as an example, there could be other ways to get an `issue_number` too
-
-a second more dense exmaple
-the merge tool `GITHUB_MERGE_A_PULL_REQUEST` needs a `pull_number`, if you only have a branch name you first list the pull requests with `GITHUB_LIST_PULL_REQUESTS` to find the matching one and then you can merge it
-
-when we agentically execute actions inside composio, we need to know either what info to get from the user or what other action we should take before we execute the action.
-
-to keep this limited in scope, we give you [Github](https://docs.composio.dev/toolkits/github) as an example toolkit to build and test against — but your generator should generalize: it reads a toolkit's catalog and produces the graph, so it works for any toolkit, not just this one
-
-the final submission should be a visualized dependency graph where i can see connection (this is not super important just should exist for me to see if graph with edges and nodes)
-
 ## Implemented solution
 
 This repository contains an evidence-carrying dependency inference pipeline. It does not hardcode GitHub relationships: it normalizes any supplied catalog, recursively indexes required inputs and nested outputs, retrieves bounded type/entity-compatible candidates, optionally asks GPT-5.4 to adjudicate those closed choices, validates every response, and applies a final catalog-provenance firewall before writing the graph atomically.
