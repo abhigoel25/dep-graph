@@ -62,6 +62,7 @@ export interface ModelProtocolIssue {
     | "invalid_producers"
     | "malformed_decision"
     | "missing_case"
+    | "request_failed"
     | "unknown_case";
   message: string;
   caseId?: string;
