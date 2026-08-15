@@ -51,6 +51,32 @@ describe("indexRequiredInputs", () => {
     assert.deepEqual(result.warnings, []);
   });
 
+  it("combines properties and required fields declared beside a reference", () => {
+    const result = indexRequiredInputs({
+      type: "object",
+      properties: {
+        request: {
+          $ref: "#/$defs/BaseRequest",
+          properties: { operation_id: { type: "integer" } },
+          required: ["operation_id"],
+        },
+      },
+      required: ["request"],
+      $defs: {
+        BaseRequest: {
+          type: "object",
+          properties: { resource_id: { type: "string" } },
+          required: ["resource_id"],
+        },
+      },
+    });
+
+    assert.deepEqual(
+      result.fields.map((field) => field.path),
+      ["request.operation_id", "request.resource_id"],
+    );
+  });
+
   it("deduplicates equivalent fields contributed by schema unions", () => {
     const result = indexRequiredInputs({
       anyOf: [
@@ -69,6 +95,31 @@ describe("indexRequiredInputs", () => {
 
     assert.equal(result.fields.length, 1);
     assert.deepEqual(result.fields[0]?.types, ["integer", "string"]);
+  });
+
+  it("retains base properties declared beside a union", () => {
+    const result = indexRequiredInputs({
+      type: "object",
+      properties: { scope_id: { type: "string" } },
+      required: ["scope_id"],
+      anyOf: [
+        {
+          type: "object",
+          properties: { issue_number: { type: "integer" } },
+          required: ["issue_number"],
+        },
+        {
+          type: "object",
+          properties: { pull_number: { type: "integer" } },
+          required: ["pull_number"],
+        },
+      ],
+    });
+
+    assert.deepEqual(
+      result.fields.map((field) => field.path),
+      ["issue_number", "pull_number", "scope_id"],
+    );
   });
 });
 

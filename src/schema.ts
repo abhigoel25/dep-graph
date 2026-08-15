@@ -126,6 +126,21 @@ function resolveLocalRef(root: JsonSchema, ref: string): JsonObject | undefined 
   return isJsonObject(current) ? current : undefined;
 }
 
+function combineReferencedSchema(resolved: JsonSchema, referencing: JsonSchema): JsonSchema {
+  const combined: JsonSchema = { ...resolved, ...referencing };
+  delete combined.$ref;
+
+  const resolvedProperties = isJsonObject(resolved.properties) ? resolved.properties : {};
+  const siblingProperties = isJsonObject(referencing.properties) ? referencing.properties : {};
+  if (Object.keys(resolvedProperties).length > 0 || Object.keys(siblingProperties).length > 0) {
+    combined.properties = { ...resolvedProperties, ...siblingProperties };
+  }
+
+  const required = uniqueSorted([...strings(resolved.required), ...strings(referencing.required)]);
+  if (required.length > 0) combined.required = required;
+  return combined;
+}
+
 function addWarning(
   context: WalkContext,
   warning: SchemaWarning,
@@ -193,7 +208,14 @@ function walkSchema(
     }
 
     context.activeRefs.add(ref);
-    walkSchema(resolved, pathSegments, required, depth + 1, context, metadata);
+    walkSchema(
+      combineReferencedSchema(resolved, schema),
+      pathSegments,
+      required,
+      depth + 1,
+      context,
+      metadata,
+    );
     context.activeRefs.delete(ref);
     return;
   }
@@ -208,8 +230,6 @@ function walkSchema(
       walkSchema(variant, pathSegments, required, depth + 1, context, metadata);
     }
   }
-  if (traversedCombination) return;
-
   const properties = isJsonObject(schema.properties) ? schema.properties : undefined;
   if (properties && Object.keys(properties).length > 0) {
     const requiredSet = requiredNames(schema);
@@ -262,7 +282,7 @@ function walkSchema(
     return;
   }
 
-  recordLeaf(schema, pathSegments, required, metadata, context);
+  if (!traversedCombination) recordLeaf(schema, pathSegments, required, metadata, context);
 }
 
 export function indexSchemaFields(schema: JsonSchema, source: FieldSource): SchemaIndex {
