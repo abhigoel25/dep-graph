@@ -109,3 +109,18 @@ export interface DependencyGraph {
   nodes: GraphNode[];
   edges: GraphEdge[];
 }
+
+export type GraphIntegrityIssueCode =
+  | "consumer_not_found"
+  | "duplicate_node"
+  | "label_not_required"
+  | "node_not_found"
+  | "producer_not_found"
+  | "self_edge";
+
+export interface GraphIntegrityIssue {
+  code: GraphIntegrityIssueCode;
+  message: string;
+  edge?: GraphEdge;
+  nodeId?: string;
+}
