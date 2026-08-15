@@ -18,7 +18,7 @@ import type {
   NormalizedTool,
 } from "./types.js";
 
-const DEFAULT_MODEL = "openai/gpt-4o";
+export const DEFAULT_MODEL = "openai/gpt-5.4";
 const DEFAULT_CONCURRENCY = 3;
 const DEFAULT_MAX_RETRIES = 2;
 const DEFAULT_RETRY_DELAY_MS = 300;

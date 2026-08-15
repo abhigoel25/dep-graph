@@ -4,6 +4,7 @@ import { describe, it } from "node:test";
 import {
   adjudicateCandidates,
   createModelTransportFromEnv,
+  DEFAULT_MODEL,
 } from "../src/adjudicator.js";
 import type {
   ModelCompletion,
@@ -123,6 +124,10 @@ class FakeTransport implements ModelTransport {
 const noSleep = async (): Promise<void> => undefined;
 
 describe("model transport configuration", () => {
+  it("uses the evaluated frontier model as the explicit default", () => {
+    assert.equal(DEFAULT_MODEL, "openai/gpt-5.4");
+  });
+
   it("requires both the assessment key and base URL", () => {
     assert.equal(createModelTransportFromEnv({}), undefined);
     assert.equal(createModelTransportFromEnv({ OPENAI_API_KEY: "key" }), undefined);
