@@ -3,9 +3,13 @@ import { describe, it } from "node:test";
 
 import { inferDependencyCandidates } from "../src/candidates.js";
 import { loadCatalogFile } from "../src/catalog.js";
+import { assembleGraph } from "../src/graph.js";
+import { selectDeterministicEdges } from "../src/selection.js";
 
 const github = loadCatalogFile("github_catalog.json");
 const inferred = inferDependencyCandidates(github.tools);
+const selected = selectDeterministicEdges(inferred);
+const graph = assembleGraph(github.tools, selected.edges);
 
 function candidateCase(consumerSlug: string, label: string) {
   const match = inferred.cases.find(
@@ -53,5 +57,26 @@ describe("supplied GitHub catalog candidate inference", () => {
     assert.equal(listPulls.outputPath, "data.pull_requests[].number");
     assert.equal(listPulls.score, pull.candidates[0]?.score);
     assert.equal(listPulls.confidence, "high");
+  });
+
+  it("assembles a non-empty integrity-checked graph with both canonical edges", () => {
+    assert.equal(graph.nodes.length, 893);
+    assert.ok(graph.edges.length > 1_000);
+    assert.ok(
+      graph.edges.some(
+        (edge) =>
+          edge.from === "GITHUB_LIST_REPOSITORY_ISSUES" &&
+          edge.to === "GITHUB_CREATE_AN_ISSUE_COMMENT" &&
+          edge.label === "issue_number",
+      ),
+    );
+    assert.ok(
+      graph.edges.some(
+        (edge) =>
+          edge.from === "GITHUB_LIST_PULL_REQUESTS" &&
+          edge.to === "GITHUB_MERGE_A_PULL_REQUEST" &&
+          edge.label === "pull_number",
+      ),
+    );
   });
 });

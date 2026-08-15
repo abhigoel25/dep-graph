@@ -118,6 +118,12 @@ export interface DeterministicSelectionResult {
   stats: DeterministicSelectionStats;
 }
 
+export interface OfflineGenerationResult {
+  graph: DependencyGraph;
+  inference: CandidateInferenceResult;
+  selection: DeterministicSelectionResult;
+}
+
 export interface GraphNode {
   id: string;
   service?: string;
