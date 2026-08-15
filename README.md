@@ -113,7 +113,11 @@ npm run visualize
 
 Open `http://127.0.0.1:4173`. Dependency Atlas combines a draggable, zoomable 3D overview of the complete graph with a focused flow mode for one operation. Search, direction filters, connection limits, hub-scaled nodes, selected-neighborhood emphasis, and a connection drawer make the dense graph navigable. Selecting a connection reveals exact schema mappings, rank, confidence, score, rationale, and weighted evidence. It uses a dependency-free Canvas renderer and requires no external network.
 
+Only the selected operation's highlighted edges are interactive in the 3D view, preventing the faint global context from competing for clicks. Focused Flow renders readable upstream and downstream cards, directional arrows, and field labels; `?view=focus` opens it directly.
+
 ![Dependency Atlas](visualization/dependency-atlas.png)
+
+![Focused dependency flow](visualization/dependency-focused-flow.png)
 
 ### Quality and resilience
 
