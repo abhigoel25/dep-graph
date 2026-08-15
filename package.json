@@ -6,6 +6,7 @@
     "generate": "node --env-file-if-exists=.env --import tsx src/generate.ts",
     "evaluate": "node --import tsx src/evaluate.ts",
     "evaluate:live": "node --env-file-if-exists=.env --import tsx src/live-evaluate.ts",
+    "visualize": "node --import tsx src/serve-visualization.ts",
     "selfcheck": "node --import tsx src/selfcheck.ts",
     "test": "node --import tsx --test test/*.test.ts",
     "typecheck": "tsc --noEmit"
